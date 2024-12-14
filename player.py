@@ -20,8 +20,8 @@ class Player:
         self.mainplayer.clear()
         self.mainplayer.penup()
         #self.mainplayer.goto(x, y)
-        self.mainplayer.seth(ang)
-        self.mainplayer.forward(dist)
+        #self.mainplayer.seth(ang)
+        #self.mainplayer.forward(dist)
         #
         self.mainplayer.pendown()
         
