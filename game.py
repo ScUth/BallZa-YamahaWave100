@@ -5,6 +5,7 @@ import gri_d
 import hat
 import arrow
 import senemy
+import gameover
 import math
 import turtle
 import pynput # for mouse listener
@@ -51,6 +52,7 @@ class Run:
         self.yc = 0 # clicker location
         self.sxlp = 0 # Player simulation location
         self.sylp = 0 # Player simulation location
+        self.hit_rad = 40
         self.x_pos, self.y_pos = self.main_player.pos()
         self.es1x, self.es1y = self.enm1.pos()
         self.es2x, self.es2y = self.enm2.pos()
@@ -61,6 +63,12 @@ class Run:
         self.arrow_speed = 100
         self.shooter_on_board = False
         self.life_status = True
+        self.el_1 = True
+        self.el_2 = True
+        self.el_3 = True
+        self.el_4 = True
+        self.el_5 = True
+        self.win = False
         #enemy default setting
         
     def set_daf_ene(self):
@@ -84,7 +92,6 @@ class Run:
         self.es3x, self.es3y = self.enm3.pos()
         self.es4x, self.es4y = self.enm4.pos()
         self.es5x, self.es5y = self.enm5.pos()
-        x_grid, y_grid = self.tugrid.pos()
         for enemy, xi, yi in [
             (self.enm1, self.es1x, self.es1y),
             (self.enm2, self.es2x, self.es2y),
@@ -160,22 +167,26 @@ class Run:
         if self.fire is True and self.shooter_on_board is False:
             self.arrow_shooter.goto(x_pos, y_pos)
             self.arrow.goto(self.xc - 965, -self.yc + 575)
-            #print(angle * 180 / math.pi)
             self.shooter_on_board = True
             self.fire = False
         elif self.fire is False and self.shooter_on_board is True:
             self.arrow.goto(xcc - x, ycc - y)
             self.arrow_shooter.goto(xs - x, ys - y)
             self.arrow_control.fire(angle * 180 / math.pi, self.arrow_speed)
-            #if 45 < angle < 225:
-            #    # base on boarder position. x is the same but y + self.boarder_size         # IF ARROW HIT ENEMY
-            #    if xs >= x_grid and ys <= y_grid + self.boarder_size:
-            #        self.arrow_shooter.clear()
-            #        self.shooter_on_board = False
-            #if 225 < angle < 405:
-            #    if xs <= x_grid + self.boarder_size and ys >= y_grid:
-            #        self.arrow_shooter.clear()
-            #        self.shooter_on_board = False
+            
+            # Check for collision and handle hit
+            for i, (enemy, el_status, esx, esy) in enumerate([
+                (self.enm1, self.el_1, self.es1x, self.es1y),
+                (self.enm2, self.el_2, self.es2x, self.es2y),
+                (self.enm3, self.el_3, self.es3x, self.es3y),
+                (self.enm4, self.el_4, self.es4x, self.es4y),
+                (self.enm5, self.el_5, self.es5x, self.es5y),
+            ]):
+                if el_status and int(xs) in range(int(esx) - self.hit_rad, int(esx) + self.hit_rad) and int(ys) in range(int(esy) - self.hit_rad, int(esy) + self.hit_rad):
+                    setattr(self, f'el_{i+1}', False)  # Set el_status to False
+                    enemy.hideturtle()  # Hide the enemy
+                    enemy.clear()  # Clear its drawings
+                    print(f'{i+1}hit')
         elif self.fire is False and self.shooter_on_board is False:
             self.arrow_shooter.goto(x_pos, y_pos)
             self.arrow.goto(xcc - x, ycc - y)
@@ -184,24 +195,26 @@ class Run:
         #check collision btw player and bots (enemy)
         #print(self.es1x, self.es1y)
         hit_range = [i for i in range(-51, 52)]
-        for enemy, xi, yi in [
-            (self.enm1, self.es1x, self.es1y),
-            (self.enm2, self.es2x, self.es2y),
-            (self.enm3, self.es3x, self.es3y),
-            (self.enm4, self.es4x, self.es4y),
-            (self.enm5, self.es5x, self.es5y),
-        ]:
-            if (int(xi) in hit_range) and (int(yi) in hit_range):
-                self.life_status = False
-                print("hit")
-        pass
+        for i, (enemy, el_status, esx, esy) in enumerate([
+            (self.enm1, self.el_1, self.es1x, self.es1y),
+            (self.enm2, self.el_2, self.es2x, self.es2y),
+            (self.enm3, self.el_3, self.es3x, self.es3y),
+            (self.enm4, self.el_4, self.es4x, self.es4y),
+            (self.enm5, self.el_5, self.es5x, self.es5y),
+        ]):
+            if el_status:  # Only check active enemies
+                if int(esx) in hit_range and int(esy) in hit_range:
+                    self.life_status = False
+                    print(f"Player hit by enemy {i + 1}")
     
     def camera(self, x, y):
         # grid
         x_grid, y_grid = self.tugrid.pos()
         if self.life_status is True:
             self.tugrid_control.set_loma(x_grid - x, y_grid - y)
-        else:
+        elif self.win is True:
+            self.tugrid_control.set_loma(x_grid, y_grid)
+        elif self.life_status is False:
             self.tugrid_control.set_loma(x_grid, y_grid)
         pass
     
@@ -209,6 +222,10 @@ class Run:
         if self.life_status is False:
             self.player_control.clear()
             self.hat_control.clear()
+            game_massage = gameover.gover(self.mphat)
+            game_massage.create()
+        if self.el_1 and self.el_2 and self.el_3 and self.el_4 and self.el_5:
+            self.win = True
     
     def __redraw(self):
         turtle.clear()
