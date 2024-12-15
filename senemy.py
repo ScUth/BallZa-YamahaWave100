@@ -11,10 +11,10 @@ class enemy_setting:
         self.enemy.shapesize(3)
         self.enemy.color("orange")
         self.enemy.penup()
-        print("set random position")
+        #print("set random position")
         self.enemy.goto(-random.randint(0, self.bdsize), -random.randint(0, self.bdsize))
         x, y = self.enemy.pos()
-        print(x,y)
+        #print(x,y)
         return x, y
         
     def set_loma(self, x, y):

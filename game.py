@@ -60,10 +60,11 @@ class Run:
         self.fire = False
         self.arrow_speed = 100
         self.shooter_on_board = False
+        self.life_status = True
         #enemy default setting
         
     def set_daf_ene(self):
-        print("set enermy")
+        #print("set enermy")
         self.es1 = senemy.enemy_setting(self.enm1, self.bd_hw)
         self.es2 = senemy.enemy_setting(self.enm2, self.bd_hw)
         self.es3 = senemy.enemy_setting(self.enm3, self.bd_hw)
@@ -91,11 +92,16 @@ class Run:
             (self.enm4, self.es4x, self.es4y),
             (self.enm5, self.es5x, self.es5y),
         ]:
-            
-            enemy.goto(xi - x, yi - y)
+            if self.life_status is True:
+                enemy.goto(xi - x, yi - y)
+            else:
+                enemy.goto(xi, yi)
     
     def on_move(self, x, y):
-        self.xx, self.yy = x, y
+        if self.life_status is True:
+            self.xx, self.yy = x, y
+        else:
+            pass
         
     def on_click(self, x, y, button, pressed):
         if pressed:
@@ -162,7 +168,7 @@ class Run:
             self.arrow_shooter.goto(xs - x, ys - y)
             self.arrow_control.fire(angle * 180 / math.pi, self.arrow_speed)
             #if 45 < angle < 225:
-            #    # base on boarder position. x is the same but y + self.boarder_size
+            #    # base on boarder position. x is the same but y + self.boarder_size         # IF ARROW HIT ENEMY
             #    if xs >= x_grid and ys <= y_grid + self.boarder_size:
             #        self.arrow_shooter.clear()
             #        self.shooter_on_board = False
@@ -173,12 +179,36 @@ class Run:
         elif self.fire is False and self.shooter_on_board is False:
             self.arrow_shooter.goto(x_pos, y_pos)
             self.arrow.goto(xcc - x, ycc - y)
+            
+    def check_collision(self):
+        #check collision btw player and bots (enemy)
+        #print(self.es1x, self.es1y)
+        hit_range = [i for i in range(-51, 52)]
+        for enemy, xi, yi in [
+            (self.enm1, self.es1x, self.es1y),
+            (self.enm2, self.es2x, self.es2y),
+            (self.enm3, self.es3x, self.es3y),
+            (self.enm4, self.es4x, self.es4y),
+            (self.enm5, self.es5x, self.es5y),
+        ]:
+            if (int(xi) in hit_range) and (int(yi) in hit_range):
+                self.life_status = False
+                print("hit")
+        pass
     
     def camera(self, x, y):
         # grid
         x_grid, y_grid = self.tugrid.pos()
-        self.tugrid_control.set_loma(x_grid - x, y_grid - y)
+        if self.life_status is True:
+            self.tugrid_control.set_loma(x_grid - x, y_grid - y)
+        else:
+            self.tugrid_control.set_loma(x_grid, y_grid)
         pass
+    
+    def check_death(self):
+        if self.life_status is False:
+            self.player_control.clear()
+            self.hat_control.clear()
     
     def __redraw(self):
         turtle.clear()
@@ -210,6 +240,8 @@ class Run:
             self.player_control.set_location(self.xx - 965, -self.yy + 575, dist, (angle*180/math.pi))
             self.boarder_check()
             self.arrow_adj(self.distx/6, self.disty/6)
+            self.check_collision()
+            self.check_death()
             #print(x_grid, y_grid, self.distx/6, self.disty/6)
             #self.test.goto((self.xc - 965), (- self.yc + 575))
             #a, b = self.arrow_shooter.pos()
@@ -221,7 +253,7 @@ class Run:
         #self.player_control.draw()
         self.tugrid_control.draw()
         self.hat_control.draw()
-        print("call set emermy")
+        #print("call set emermy")
         self.set_daf_ene()
         self.move()
         self.__redraw()

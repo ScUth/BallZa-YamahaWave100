@@ -10,6 +10,9 @@ class Player:
     
     def draw(self):
         pass
+    
+    def clear(self):
+        self.mainplayer.clear()
         
     def Move(self, dist, ang):
         # speed is directly proportional to distance btw mouse and player
