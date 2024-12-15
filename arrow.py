@@ -3,12 +3,15 @@ import turtle
 class Arrow:
     def __init__(self, arrow):
         self.arrow = arrow
-        self.state = "ready"
     
-    def fire(self):
-        if self.state == "ready":
-            self.state = "active"
-    
-    def set_loma(self, x, y):
+    def fire(self, ang, speed):
+        self.arrow.clear()
+        self.arrow.speed(0)
         self.arrow.pendown()
-        self.arrow.goto(x, y)
+        self.arrow.seth(ang)
+        self.arrow.forward(speed)
+        
+    
+    #def set_loma(self, x, y):
+    #    self.arrow.pendown()
+    #    self.arrow.goto(x, y)
