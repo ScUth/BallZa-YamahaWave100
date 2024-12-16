@@ -37,7 +37,8 @@ class gover:
         self.ttl.forward(size / 1.5)
         self.ttl.backward(size / 1.5)
         self.ttl.right(180 + math.degrees(math.atan(size / (size/2))))
-        self.ttl.forward(math.sqrt(size**2+(size/2)**2) - math.sqrt(size**2+(size/2)**2) / 1.5)
+        self.ttl.forward(
+            math.sqrt(size**2+(size/2)**2) - math.sqrt(size**2+(size/2)**2) / 1.5)
         self.ttl.seth(0)
         self.ttl.penup()
         
