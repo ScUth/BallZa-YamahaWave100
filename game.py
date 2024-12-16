@@ -9,7 +9,7 @@ import gameover
 import math
 import turtle
 import pynput # for mouse listener
-import random
+import time
 
 #canvas
 class Run:
@@ -19,7 +19,6 @@ class Run:
         self.screen = turtle.Screen()
         self.screen.colormode(255)
         self.screen.title("BallZa-YamahaWave100")
-        #self.screen.tracer(0)
         self.screen.addshape(self.playerb)
         self.main_player = turtle.Turtle(self.playerb)
         # turtle
@@ -33,14 +32,15 @@ class Run:
         self.enm3 = turtle.Turtle()
         self.enm4 = turtle.Turtle()
         self.enm5 = turtle.Turtle()
-        #self.test = turtle.Turtle() #for test only
         # adjust
         self.player_size = 25
         self.player_stroke = 2
         self.boarder_size = 2000
         self.bd_hw = self.boarder_size / 2
-        #self.test.color("red")
-        #self.test.penup()
+        self.hit_rad = 40 # range oƒ enemy to hit
+        self.calx = 965 # from mouse calibrator
+        self.caly = 575 # from mouse calibrator
+        self.arrow_speed = 100
         # set
         self.player_control = player.Player(self.main_player, strk= self.player_stroke, size = self.player_size)
         self.tugrid_control = gri_d.draw_grid(self.tugrid, self.boarder_size)
@@ -52,15 +52,15 @@ class Run:
         self.yc = 0 # clicker location
         self.sxlp = 0 # Player simulation location
         self.sylp = 0 # Player simulation location
-        self.hit_rad = 40
+        # position
         self.x_pos, self.y_pos = self.main_player.pos()
         self.es1x, self.es1y = self.enm1.pos()
         self.es2x, self.es2y = self.enm2.pos()
         self.es3x, self.es3y = self.enm3.pos()
         self.es4x, self.es4y = self.enm4.pos()
         self.es5x, self.es5y = self.enm5.pos()
+        # status
         self.fire = False
-        self.arrow_speed = 100
         self.shooter_on_board = False
         self.life_status = True
         self.el_1 = True
@@ -72,7 +72,6 @@ class Run:
         #enemy default setting
         
     def set_daf_ene(self):
-        #print("set enermy")
         self.es1 = senemy.enemy_setting(self.enm1, self.bd_hw)
         self.es2 = senemy.enemy_setting(self.enm2, self.bd_hw)
         self.es3 = senemy.enemy_setting(self.enm3, self.bd_hw)
@@ -99,13 +98,14 @@ class Run:
             (self.enm4, self.es4x, self.es4y),
             (self.enm5, self.es5x, self.es5y),
         ]:
+            dx, dy = self.distance_btw_p_2(self.x_pos, self.y_pos, xi, yi)
             if self.life_status is True:
-                enemy.goto(xi - x, yi - y)
+                enemy.goto(xi - x - (dx / 10), yi - y - (dy / 10))
             else:
                 enemy.goto(xi, yi)
     
     def on_move(self, x, y):
-        if self.life_status is True:
+        if self.life_status is True and self.win is False:
             self.xx, self.yy = x, y
         else:
             pass
@@ -115,14 +115,11 @@ class Run:
             self.fire = True
             self.xc, self.yc = x, y
             if self.shooter_on_board is True:
-                #self.shooter_on_board = False
-                #self.arrow_shooter.goto(self.x_pos, self.y_pos)
                 self.shooter_on_board = False
         
     def boarder_check(self):
         x, y = self.tugrid.pos()
         x += 17
-        #print(x, y)
         if x <= -self.boarder_size:
             self.camera(0, self.disty/6)
             self.tugrid_control.set_loma(x+20, y)
@@ -159,11 +156,9 @@ class Run:
         self.arrow_shooter.penup()
         xcc, ycc = self.arrow.pos()
         xs, ys = self.arrow_shooter.pos()
-        #print(xs, ys)
         x_pos, y_pos = self.main_player.pos()
         x_grid, y_grid = self.tugrid.pos()
-        angle = self.angle_btw_p(x_pos, y_pos, self.xc - 965, -self.yc + 575)
-        #print(xcc, ycc)
+        angle = self.angle_btw_p(x_pos, y_pos, self.xc - self.calx, -self.yc + self.caly)
         if self.fire is True and self.shooter_on_board is False:
             self.arrow_shooter.goto(x_pos, y_pos)
             self.arrow.goto(self.xc - 965, -self.yc + 575)
@@ -173,8 +168,7 @@ class Run:
             self.arrow.goto(xcc - x, ycc - y)
             self.arrow_shooter.goto(xs - x, ys - y)
             self.arrow_control.fire(angle * 180 / math.pi, self.arrow_speed)
-            
-            # Check for collision and handle hit
+            # Check for player collision
             for i, (enemy, el_status, esx, esy) in enumerate([
                 (self.enm1, self.el_1, self.es1x, self.es1y),
                 (self.enm2, self.el_2, self.es2x, self.es2y),
@@ -182,18 +176,24 @@ class Run:
                 (self.enm4, self.el_4, self.es4x, self.es4y),
                 (self.enm5, self.el_5, self.es5x, self.es5y),
             ]):
+                #print(el_status)
                 if el_status and int(xs) in range(int(esx) - self.hit_rad, int(esx) + self.hit_rad) and int(ys) in range(int(esy) - self.hit_rad, int(esy) + self.hit_rad):
                     setattr(self, f'el_{i+1}', False)  # Set el_status to False
                     enemy.hideturtle()  # Hide the enemy
                     enemy.clear()  # Clear its drawings
+                    self.shooter_on_board = False
                     print(f'{i+1}hit')
+            # Check for boarder collision
+            if xs < x_grid or xs > x_grid + self.boarder_size:
+                self.shooter_on_board = False
+            if ys < y_grid or ys > y_grid + self.boarder_size:
+                self.shooter_on_board = False
         elif self.fire is False and self.shooter_on_board is False:
             self.arrow_shooter.goto(x_pos, y_pos)
             self.arrow.goto(xcc - x, ycc - y)
             
     def check_collision(self):
         #check collision btw player and bots (enemy)
-        #print(self.es1x, self.es1y)
         hit_range = [i for i in range(-51, 52)]
         for i, (enemy, el_status, esx, esy) in enumerate([
             (self.enm1, self.el_1, self.es1x, self.es1y),
@@ -212,19 +212,20 @@ class Run:
         x_grid, y_grid = self.tugrid.pos()
         if self.life_status is True:
             self.tugrid_control.set_loma(x_grid - x, y_grid - y)
-        elif self.win is True:
-            self.tugrid_control.set_loma(x_grid, y_grid)
-        elif self.life_status is False:
+        elif self.win is True or self.life_status is False:
             self.tugrid_control.set_loma(x_grid, y_grid)
         pass
     
     def check_death(self):
+        game_massage = gameover.gover(self.mphat)
         if self.life_status is False:
             self.player_control.clear()
             self.hat_control.clear()
-            game_massage = gameover.gover(self.mphat)
             game_massage.create()
-        if self.el_1 and self.el_2 and self.el_3 and self.el_4 and self.el_5:
+        if self.el_1 is False and self.el_2 is False and self.el_3 is False and self.el_4 is False and self.el_5 is False:
+            self.player_control.clear()
+            self.hat_control.clear()
+            game_massage.win()
             self.win = True
     
     def __redraw(self):
@@ -233,28 +234,27 @@ class Run:
         turtle.update()
     
     def move(self):
-        # detect mouse
+        # detect mouse move and click
         listener = pynput.mouse.Listener(on_move= self.on_move, on_click= self.on_click)
         listener.start()
-        #liscliker.start()
-        # turtle part
+        # turtle part (mainloop)
         while True:
             self.detect_mouse.penup()
-            self.detect_mouse.goto(self.xx - 965, -self.yy + 575)
+            self.detect_mouse.goto(self.xx - self.calx, -self.yy + self.caly)
             x_grid, y_grid = self.tugrid.pos()
             # distance between cursor and player
-            dist = self.distance_btw_p(self.x_pos , self.y_pos , self.xx - 965 , -self.yy + 575)
+            dist = self.distance_btw_p(self.x_pos , self.y_pos , self.xx - self.calx , -self.yy + self.caly)
             # x and y distance between cursor and player
-            self.distx, self.disty = self.distance_btw_p_2(self.x_pos, self.y_pos, self.xx - 965 , -self.yy + 575)
+            self.distx, self.disty = self.distance_btw_p_2(self.x_pos, self.y_pos, self.xx - self.calx , -self.yy + self.caly)
             # angle between player and cursor
-            angle = self.angle_btw_p(self.x_pos , self.y_pos , self.xx - 965 , -self.yy + 575)
+            angle = self.angle_btw_p(self.x_pos , self.y_pos , self.xx - self.calx , -self.yy + self.caly)
             # simulation location of player (Exactly location)
             self.sxlp = -(x_grid + (self.boarder_size / 2))
             self.sylp = -(y_grid + (self.boarder_size / 2))
             #print(sxlp, sylp)
             self.enemy_adj(self.distx/6, self.disty/6)
             self.hat_control.set_loma(self.x_pos + ((2*self.player_size) * math.cos(angle)), self.y_pos + ((2*self.player_size) * math.sin(angle)), (angle*180/math.pi))
-            self.player_control.set_location(self.xx - 965, -self.yy + 575, dist, (angle*180/math.pi))
+            self.player_control.set_location(self.xx - self.calx, -self.yy + self.caly, dist, (angle*180/math.pi))
             self.boarder_check()
             self.arrow_adj(self.distx/6, self.disty/6)
             self.check_collision()
@@ -267,7 +267,6 @@ class Run:
             
     
     def run(self):
-        #self.player_control.draw()
         self.tugrid_control.draw()
         self.hat_control.draw()
         #print("call set emermy")

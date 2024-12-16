@@ -27,14 +27,3 @@ class Player:
         #self.mainplayer.forward(dist)
         #
         self.mainplayer.pendown()
-        
-        # redraw
-            #self.mainplayer.speed(0)
-            #self.mainplayer.penup()
-            #self.mainplayer.seth(ang)
-            #self.mainplayer.pendown()
-            #self.mainplayer.width(self.pensize)
-            #self.mainplayer.circle(self.size)
-            #self.mainplayer.penup()
-            #self.mainplayer.seth(ang)
-            #self.mainplayer.forward(self.size)

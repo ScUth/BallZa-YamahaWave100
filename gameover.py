@@ -118,7 +118,41 @@ class gover:
         self.ttl.seth(0)
         self.ttl.penup()
         
-    #def WIN
+    def w(self, size):
+        self.ttl.seth(90)
+        self.ttl.forward(size)
+        self.ttl.pendown()
+        self.ttl.right(180 - math.degrees(math.atan((size/4) / (size))))
+        self.ttl.forward(math.sqrt((size/4)**2 + (size)**2))
+        self.ttl.left(180 - 2* math.degrees(math.atan((size/4) / (size))))
+        self.ttl.forward(math.sqrt((size/4)**2 + (size)**2))
+        self.ttl.right(180 - 2*math.degrees(math.atan((size/4) / (size))))
+        self.ttl.forward(math.sqrt((size/4)**2 + (size)**2))
+        self.ttl.left(180 - 2* math.degrees(math.atan((size/4) / (size))))
+        self.ttl.forward(math.sqrt((size/4)**2 + (size)**2))
+        self.ttl.penup()
+        self.ttl.seth(90)
+        self.ttl.backward(size)
+        self.ttl.seth(0)
+
+    def i(self, size):
+        self.ttl.seth(90)
+        self.ttl.pendown()
+        self.ttl.forward(size)
+        self.ttl.backward(size)
+        self.ttl.seth(0)
+        self.ttl.penup()
+        
+    def n(self, size):
+        self.ttl.seth(90)
+        self.ttl.pendown()
+        self.ttl.forward(size)
+        self.ttl.right(135)
+        self.ttl.forward(math.sqrt(size**2 + size**2))
+        self.ttl.left(135)
+        self.ttl.forward(size)
+        self.ttl.backward(size)
+        self.ttl.seth(0)
         
     def create(self):
         self.ttl.speed(0)
@@ -139,3 +173,12 @@ class gover:
         self.e(100)
         self.ttl.forward(10)
         self.r(100)
+        
+    def win(self):
+        self.ttl.speed(0)
+        self.ttl.goto(-150, 0)
+        self.w(100)
+        self.ttl.forward(10)
+        self.i(100)
+        self.ttl.forward(10)
+        self.n(100)

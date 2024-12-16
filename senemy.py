@@ -11,7 +11,7 @@ class enemy_setting:
         self.enemy.shapesize(3)
         self.enemy.color("orange")
         self.enemy.penup()
-        #print("set random position")
+        # Set random position
         self.enemy.goto(random.randint(-self.bdsize, self.bdsize), random.randint(-self.bdsize, self.bdsize))
         x, y = self.enemy.pos()
         #print(x,y)
