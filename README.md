@@ -1,7 +1,7 @@
 # BallZa-YamahaWave100
 ## Project description
 This project is a game that let user(you) are the player fires 5 enemy(bot) in game, once you kill them all you win and get win messege, but if you hit the enemy once, you died and get game over message. This game is like .io game on internet in the way that player doesn't move but environment does move.
-## $\textcolor{red}{\textrm{How to install and run the project}}$ (IMPORTANT)
+## $\textcolor{red}{\textrm{How to install and run the project (IMPORTANT)}}$ 
 This python game **require** 
 - [python](https://www.python.org/)
   - Requirement python version ```3.11``` and below. (error/bug with version ```3.13.0```)
@@ -30,9 +30,40 @@ If you finish installed the require library and python and already clone this re
 
 ## Project design and implementation
 - UML class diagram
+    ![UML class (2)](https://github.com/user-attachments/assets/95cb51c8-7170-4904-a370-658ceb55a17f)
+    ![UML class - Page 1](https://github.com/user-attachments/assets/f792c231-af46-4b5d-8970-daf1ef7eef2b)
+
 - Purpose of each class
+  - Run
+    
+      The purpose of this class is I want this to be a main loop. Combind every thing and allocate in here. 
+  - enemy_setting
+    
+      To adjust size, shape size, color, set location in here.
+  - Player
+    
+      To set location of player.
+  - draw_grid
+    
+      At first I want to draw grid becasue it's easy to see that player is moving or not, but I through it's going to be laggy, so I just made the boarder. This class draw boarder and set location of its.
+  - hat_move
+    
+      To draw hat (the player arrow) and set the location of its.
+  - Arrow
+    
+      To fire an arrow-shooter (set angle forward an turtle).
+  - gover
+    
+      To draw the charracter in turtle. Store each function is each charracter. And call a set of word at the end.
+  - callibrate
+    
+      This is the separate programe from main. It's use for set the right position of pynput mouse because at first the indicator is not accuracy.
 - Modification
+  
+  From aj. Paruj baseline code, I've use the way he write (for some part). It's hard to understand what the code was especially in collision. So I just learn the way oop work from his code such as import other file and use class in that file and main-loop.
 - Code testing
+  
+  The way that I test my code is just run it and test in every case that my code is work perfectly fine or not, If not I try to spot where it's cause to error. I've try print many many word to make sure it's run by order or not, or to see some status that is raise in true situation or not. From my proposal I followed what I wrote in there not 100%, some of it I can't do such as arrow fade out because my animation isn't smooth and I try fade thing and python raise me error. And I'm not expect my game to be about 5 fps like this lol. And I didn't make the score system. The bugs that I found now is some time I shoot arrow and it's hit the enemy, but the enemy isn't died, but you can just shoot more arrow maybe it's the hit box (you can set it in ```__init__``` (```self.hit_rad```))
 
 ## Rate your project
 95
