@@ -10,8 +10,3 @@ class Arrow:
         self.arrow.pendown()
         self.arrow.seth(ang)
         self.arrow.forward(speed)
-        
-    
-    #def set_loma(self, x, y):
-    #    self.arrow.pendown()
-    #    self.arrow.goto(x, y)

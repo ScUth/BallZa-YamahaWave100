@@ -255,15 +255,11 @@ class Run:
             self.enemy_adj(self.distx/6, self.disty/6)
             self.hat_control.set_loma(self.x_pos + ((2*self.player_size) * math.cos(angle)), self.y_pos + ((2*self.player_size) * math.sin(angle)), (angle*180/math.pi))
             self.player_control.set_location(self.xx - self.calx, -self.yy + self.caly, dist, (angle*180/math.pi))
+            # call function
             self.boarder_check()
             self.arrow_adj(self.distx/6, self.disty/6)
             self.check_collision()
             self.check_death()
-            #print(x_grid, y_grid, self.distx/6, self.disty/6)
-            #self.test.goto((self.xc - 965), (- self.yc + 575))
-            #a, b = self.arrow_shooter.pos()
-            #self.arrow_shooter.clear()
-            #print(self.shooter_on_board)
             
     
     def run(self):
